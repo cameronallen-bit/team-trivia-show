@@ -67,9 +67,6 @@ var CUR_Q = 0;
 var T_DUR = 20;
 var TIMER = 20;
 var SHOW_ANS = false;
-var AI_TOPIC = "";
-var AI_COUNT = 5;
-var AI_LOADING = false;
 var P_NAME = "";
 var P_ANS = false;
 var P_SEL = null;
@@ -232,20 +229,6 @@ function rHBuild(a) {
   var h = '<div class="nav"><h1>Build Your Quiz</h1><span class="r cac" style="font-weight:600;font-size:13px;opacity:1">' + QUESTIONS.length + ' QUESTIONS</span></div>';
   h += '<div class="cnt">';
 
-  // AI Generate
-  h += '<div class="cd">';
-  h += '<h3 style="font-size:16px" class="mb16">✨ AI Generate Questions</h3>';
-  h += '<div class="fx g12 mb12 fw">';
-  h += '<input id="ait" style="flex:2;min-width:160px" placeholder="Topic (e.g. Space, 90s Movies)" value="' + esc(AI_TOPIC) + '">';
-  h += '<select id="aic" style="flex:0;width:80px;min-width:80px">';
-  var cnts = [3, 5, 8, 10];
-  for (var ci = 0; ci < cnts.length; ci++) {
-    h += '<option value="' + cnts[ci] + '"' + (AI_COUNT === cnts[ci] ? ' selected' : '') + '>' + cnts[ci] + '</option>';
-  }
-  h += '</select></div>';
-  h += '<button class="b ba" id="aig"' + (AI_LOADING ? ' disabled' : '') + '>' + (AI_LOADING ? 'Generating...' : 'Generate') + '</button>';
-  h += '</div>';
-
   // Manual Add
   h += '<div class="cd">';
   h += '<h3 style="font-size:16px" class="mb16">✏️ Add Question Manually</h3>';
@@ -312,28 +295,6 @@ function rHBuild(a) {
     QUESTIONS.push({ text: t, options: os, correct: MANUAL_COR });
     MANUAL_COR = 0;
     R();
-  };
-
-  $("#aig").onclick = function() {
-    AI_TOPIC = $("#ait").value.trim();
-    AI_COUNT = parseInt($("#aic").value);
-    if (!AI_TOPIC) return;
-    AI_LOADING = true; R();
-    fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: 'Generate ' + AI_COUNT + ' multiple-choice trivia questions about "' + AI_TOPIC + '". Return ONLY a JSON array, no markdown, no backticks. Each element: {"text":"question","options":["A","B","C","D"],"correct":0} where correct is the 0-based index of the right answer. Make them fun and varied in difficulty.' }]
-      })
-    }).then(function(r) { return r.json(); }).then(function(d) {
-      var raw = d.content.map(function(i) { return i.text || ""; }).join("");
-      var cl = raw.replace(/```json|```/g, "").trim();
-      var gen = JSON.parse(cl);
-      for (var i = 0; i < gen.length; i++) QUESTIONS.push(gen[i]);
-      AI_LOADING = false; R();
-    }).catch(function(e) { alert("AI generation failed: " + e.message); AI_LOADING = false; R(); });
   };
 
   $a("[data-rm]").forEach(function(b) {
