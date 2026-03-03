@@ -495,7 +495,6 @@ function doReveal() {
 
 function rHPlay(a) {
   var q = QUESTIONS[CUR_Q];
-  var sorted = sortPlayers(PLAYERS);
   var h = '<div class="nav"><h1>Question ' + (CUR_Q + 1) + '/' + QUESTIONS.length + '</h1><span class="r">' + ROOM + '</span></div>';
   h += '<div class="cnt" style="max-width:700px">';
   h += '<div class="tc mb20"><div class="tr" id="td" style="border:4px solid ' + (TIMER <= 5 ? 'var(--err)' : 'var(--acc)') + ';color:' + (TIMER <= 5 ? 'var(--err)' : 'var(--pri)') + '">' + (SHOW_ANS ? '✓' : TIMER) + '</div></div>';
@@ -511,13 +510,6 @@ function rHPlay(a) {
   if (!SHOW_ANS) h += '<button class="b ba" id="rv">Reveal Answer</button>';
   else h += '<button class="b ba" id="nq">' + (CUR_Q + 1 >= QUESTIONS.length ? 'See Results →' : 'Next Question →') + '</button>';
   h += '</div>';
-  if (SHOW_ANS) {
-    h += '<div class="cd mt20"><h3 style="font-size:16px" class="mb12">Leaderboard</h3>';
-    for (var si = 0; si < sorted.length; si++) {
-      h += '<div class="rw"><span style="font-weight:600">' + medal(si) + ' ' + esc(sorted[si].name) + '</span><span style="font-weight:700;color:var(--acc)">' + (sorted[si].score || 0) + '</span></div>';
-    }
-    h += '</div>';
-  }
   h += '</div>';
   a.innerHTML = h;
   var rv = $("#rv"); if (rv) rv.onclick = doReveal;
